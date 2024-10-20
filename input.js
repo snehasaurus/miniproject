@@ -96,10 +96,28 @@ function genStudyPlan(input) {
             }
         }
     }
-    
+
     return STUDYPLAN;
 }
 
+// Function to display the study plan on the webpage
+function displayStudyPlan(studyPlan) {
+    const outputDiv = document.getElementById('output');
+    outputDiv.innerHTML = ''; // Clear previous output
+
+    // Create a list to display the study plan
+    const ul = document.createElement('ul');
+    studyPlan.forEach((day, index) => {
+        const li = document.createElement('li');
+        li.textContent = `Day ${index + 1}: ${day.join(', ')}`;
+        ul.appendChild(li);
+    });
+
+    outputDiv.appendChild(ul); // Append the list to the output div
+}
+
+// Get user input and generate the study plan
 let userInput = inputStudyPlan();
 let studyPlan = genStudyPlan(userInput);
-console.log(studyPlan);
+displayStudyPlan(studyPlan); // Display the study plan on the webpage
+
