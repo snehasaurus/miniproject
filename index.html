@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Study Schedule Tool</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Study Schedule Tool</h1>
+        <form id="scheduleForm">
+            <label for="studyHours">Total Study Hours:</label>
+            <input type="number" id="studyHours" required>
+            
+            <label for="subjects">Subjects (comma separated):</label>
+            <input type="text" id="subjects" required>
+            
+            <label for="assignments">Number of Assignments:</label>
+            <input type="number" id="assignments" required>
+            
+            <label for="difficultyLevels">Difficulty Levels (comma separated):</label>
+            <input type="text" id="difficultyLevels" required>
+
+            <label for="examDates">Exam Dates (comma separated, e.g., "2024-10-30,2024-11-05"):</label>
+            <input type="text" id="examDates" required>
+
+            <label for="assignmentDates">Assignment Dates (comma separated, e.g., "2024-10-25,2024-10-28"):</label>
+            <input type="text" id="assignmentDates" required>
+
+            <button type="submit">Generate Schedule</button>
+        </form>
+
+        <h2>Your Study Schedule</h2>
+        <div id="scheduleOutput"></div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
