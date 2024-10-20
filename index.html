@@ -3,18 +3,80 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My JavaScript Project</title>
+    <title>Study Plan</title>
+    <style>
+        body {
+            background-color: purple;
+            color: white;
+            font-family: Arial, sans-serif;
+        }
+
+        h1 {
+            color: lightyellow;
+            font-weight: bold;
+        }
+
+        h2 {
+            color: lightblue;
+            font-weight: bold;
+        }
+
+        .study-day {
+            margin-bottom: 15px;
+            padding: 10px;
+            border: 1px solid white;
+            border-radius: 5px;
+        }
+
+        .test-day {
+            color: red;
+            font-weight: bold;
+        }
+
+        .afternoon-session {
+            background-color: yellow;
+        }
+
+        .evening-session {
+            background-color: green;
+        }
+
+        label {
+            font-weight: bold;
+            color: lightgray;
+        }
+
+        input {
+            margin: 5px;
+            padding: 5px;
+        }
+
+        button {
+            background-color: white;
+            color: purple;
+            font-weight: bold;
+            border: none;
+            padding: 10px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: yellow;
+        }
+    </style>
 </head>
 <body>
-    <h1>Welcome to My JavaScript Project</h1>
-    <p>Enter something and see the output below:</p>
+    <h1>Welcome to My Study Plan Tool</h1>
+    <form id="studyForm">
+        <label for="numSubjects">Enter number of subjects:</label>
+        <input type="number" id="numSubjects" min="1" max="10" required>
+        <button type="button" onclick="generateSubjectFields()">Generate Input Fields</button>
+        <div id="subjectFields"></div>
+        <button type="submit">Submit</button>
+    </form>
+    <h2>Study Plan Output:</h2>
+    <div id="output"></div>
 
-    <input type="text" id="userInput" placeholder="Type something here...">
-    <button id="submitBtn">Submit</button>
-    
-    <h2>Output:</h2>
-    <div id="output"></div>  <!-- This is where the output will be displayed -->
-
-    <script src="input.js"></script>
+    <script src="studyplan.js"></script>
 </body>
 </html>
