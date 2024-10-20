@@ -17,6 +17,24 @@ function inputStudyPlan() {
         DIFFICULTY[i] = DIFF.toUpperCase();
     }
 
+    let ASSIGN_NUM = prompt("Enter number of assignments");
+    ASSIGN_NUM = parseInt(ASSIGN_NUM);
+
+    let ASSIGN_DATES = new Array(ASSIGN_NUM);
+    let ASSIGN_SUBJECTS = new Array(ASSIGN_NUM);
+    let ASSIGN_DIFFICULTY = new Array(ASSIGN_NUM);
+
+    for (let i = 0; i < ASSIGN_NUM; i++) {
+        let ASSIGN_DATE = prompt("Enter assignment due date (day number)");
+        ASSIGN_DATES[i] = parseInt(ASSIGN_DATE);
+
+        let ASSIGN_SUBJECT = prompt("Enter assignment subject");
+        ASSIGN_SUBJECTS[i] = ASSIGN_SUBJECT.toString();
+
+        let ASSIGN_DIFF = prompt("Enter assignment difficulty level - E for EASY, M for MEDIUM, D for DIFFICULT");
+        ASSIGN_DIFFICULTY[i] = ASSIGN_DIFF.toUpperCase();
+    }
+
     let STUDYTIME = prompt("Enter preferred study time -> M for MORNING, A for AFTERNOON, E for EVENING").toUpperCase();
     let TOTALHRS = parseInt(prompt("Enter number of hours you want to devote per day"));
     let PREFLEN = parseFloat(prompt("Enter preferred length of each study session in hours (between 0.5 hrs to 2 hours)"));
@@ -26,14 +44,28 @@ function inputStudyPlan() {
         DATES,
         SUBJECTS,
         DIFFICULTY,
+        ASSIGN_NUM,
+        ASSIGN_DATES,
+        ASSIGN_SUBJECTS,
+        ASSIGN_DIFFICULTY,
         STUDYTIME,
         TOTALHRS,
         PREFLEN
     };
 }
 
+function formatTime(timeInDecimal) {
+    let hours = Math.floor(timeInDecimal);
+    let minutes = Math.round((timeInDecimal - hours) * 60);
+    if (minutes === 60) {
+        minutes = 0;
+        hours++;
+    }
+    return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+}
+
 function genStudyPlan(input) {
-    let { NUM, DATES, SUBJECTS, DIFFICULTY, STUDYTIME, TOTALHRS, PREFLEN } = input;
+    let { NUM, DATES, SUBJECTS, DIFFICULTY, ASSIGN_NUM, ASSIGN_DATES, ASSIGN_SUBJECTS, ASSIGN_DIFFICULTY, STUDYTIME, TOTALHRS, PREFLEN } = input;
     
     let STUDYPLAN = Array.from({ length: 30 }, () => new Array(3).fill("Subject of choice"));
     let breaklen = 0;
@@ -60,64 +92,67 @@ function genStudyPlan(input) {
         START_DATE[i] = DATES[i] - DAYS_BEFORE_EXAM[i];
     }
 
-    for (let i = 0; i < NUM; i++) {
-        for (let k = START_DATE[i]; k < DATES[i]; k++) {
-            let hours_left = TOTALHRS;
-            let session_start_time = 0;
-            let slot_index = 0;
+    let DAYS_BEFORE_ASSIGNMENT = new Array(ASSIGN_NUM);
+    let ASSIGN_START_DATE = new Array(ASSIGN_NUM);
 
-            if (STUDYTIME === 'M') {
-                session_start_time = 8;
-                slot_index = 0;
-            } else if (STUDYTIME === 'A') {
-                session_start_time = 16;
-                slot_index = 1;
-            } else {
-                session_start_time = 18;
-                slot_index = 2;
-            }
+    for (let i = 0; i < ASSIGN_NUM; i++) {
+        if (ASSIGN_DIFFICULTY[i] === 'D') {
+            DAYS_BEFORE_ASSIGNMENT[i] = 4;
+        } else if (ASSIGN_DIFFICULTY[i] === 'M') {
+            DAYS_BEFORE_ASSIGNMENT[i] = 3;
+        } else {
+            DAYS_BEFORE_ASSIGNMENT[i] = 2;
+        }
+        ASSIGN_START_DATE[i] = ASSIGN_DATES[i] - DAYS_BEFORE_ASSIGNMENT[i];
+    }
 
-            while (hours_left > 0 && slot_index < 3) {
-                let session_end_time = session_start_time + PREFLEN;
-                STUDYPLAN[k][slot_index] = `Study ${SUBJECTS[i]} from ${session_start_time} to ${session_end_time}`;
-                hours_left -= PREFLEN;
+    function scheduleStudySessions(datesArray, subjectsArray, startDatesArray) {
+        for (let i = 0; i < datesArray.length; i++) {
+            for (let k = startDatesArray[i]; k < datesArray[i]; k++) {
+                let hours_left = TOTALHRS;
+                let session_start_time = 0;
+                let slot_index = 0;
 
-                session_start_time = session_end_time + breaklen;
-
-                if (session_start_time >= 12 && STUDYTIME === 'M') {
-                    slot_index = 1;
+                if (STUDYTIME === 'M') {
+                    session_start_time = 8;
+                    slot_index = 0;
+                } else if (STUDYTIME === 'A') {
                     session_start_time = 16;
-                } else if (session_start_time >= 19 && STUDYTIME === 'A') {
-                    slot_index = 2;
+                    slot_index = 1;
+                } else {
                     session_start_time = 18;
-                } else if (session_start_time >= 22 && STUDYTIME === 'E') {
-                    break;
+                    slot_index = 2;
+                }
+
+                while (hours_left > 0 && slot_index < 3) {
+                    let session_end_time = session_start_time + PREFLEN;
+                    STUDYPLAN[k][slot_index] = `Study ${subjectsArray[i]} from ${formatTime(session_start_time)} to ${formatTime(session_end_time)}`;
+                    hours_left -= PREFLEN;
+
+                    session_start_time = session_end_time + breaklen;
+
+                    if (session_start_time >= 12 && STUDYTIME === 'M') {
+                        slot_index = 1;
+                        session_start_time = 16;
+                    } else if (session_start_time >= 19 && STUDYTIME === 'A') {
+                        slot_index = 2;
+                        session_start_time = 18;
+                    } else if (session_start_time >= 22 && STUDYTIME === 'E') {
+                        break;
+                    }
                 }
             }
         }
     }
 
+    scheduleStudySessions(DATES, SUBJECTS, START_DATE); // Exams
+    scheduleStudySessions(ASSIGN_DATES, ASSIGN_SUBJECTS, ASSIGN_START_DATE); // Assignments
+
     return STUDYPLAN;
 }
 
-// Function to display the study plan on the webpage
-function displayStudyPlan(studyPlan) {
-    const outputDiv = document.getElementById('output');
-    outputDiv.innerHTML = ''; // Clear previous output
-
-    // Create a list to display the study plan
-    const ul = document.createElement('ul');
-    studyPlan.forEach((day, index) => {
-        const li = document.createElement('li');
-        li.textContent = `Day ${index + 1}: ${day.join(', ')}`;
-        ul.appendChild(li);
-    });
-
-    outputDiv.appendChild(ul); // Append the list to the output div
-}
-
-// Get user input and generate the study plan
 let userInput = inputStudyPlan();
 let studyPlan = genStudyPlan(userInput);
-displayStudyPlan(studyPlan); // Display the study plan on the webpage
+console.log(studyPlan);
+
 
