@@ -3,77 +3,33 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Study Plan Tool</title>
-    <!-- Change SCSS link to CSS -->
-    <link rel="stylesheet" href="assets/css/style.css">
-    <style>
-        /* Fallback CSS in case the external CSS file isn't loaded */
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #e5d9f2; /* Use a light purple shade */
-            color: #333;
-            text-align: center;
-        }
-        h1 {
-            font-weight: bold;
-            color: #4A148C; /* Darker purple for headings */
-        }
-        label, input {
-            margin: 10px;
-            display: block;
-        }
-        .test-day {
-            color: red;
-        }
-        .afternoon {
-            background-color: yellow;
-        }
-        .evening {
-            background-color: lightgreen;
-        }
-        .assignment-highlight {
-            background-color: #FFD700; /* Highlight assignments */
-        }
-        button {
-            background-color: #4A148C;
-            color: white;
-            border: none;
-            padding: 10px;
-            cursor: pointer;
-        }
-        button:hover {
-            background-color: #6A1B9A;
-        }
-    </style>
+    <title>Study Schedule Tool</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+    <div class="container">
+        <h1>Study Schedule Tool</h1>
+        <form id="scheduleForm">
+            <label for="studyHours">Total Study Hours:</label>
+            <input type="number" id="studyHours" required>
+            
+            <label for="subjects">Subjects (comma separated):</label>
+            <input type="text" id="subjects" required>
+            
+            <label for="assignments">Number of Assignments:</label>
+            <input type="number" id="assignments" required>
+            
+            <label for="difficultyLevels">Difficulty Levels (comma separated):</label>
+            <input type="text" id="difficultyLevels" required>
 
-    <h1>Welcome to the Study Plan and Assignment Tool</h1>
+            <button type="submit">Generate Schedule</button>
+        </form>
 
-    <div id="input-form">
-        <label for="numExams">Number of Exams:</label>
-        <input type="number" id="numExams" min="1" required>
-        
-        <label for="numAssignments">Number of Assignments:</label>
-        <input type="number" id="numAssignments" min="1" required>
-
-        <label for="studyTime">Preferred Study Time (M for Morning, A for Afternoon, E for Evening):</label>
-        <input type="text" id="studyTime" required>
-
-        <label for="totalHours">Total Study Hours per Day:</label>
-        <input type="number" id="totalHours" min="1" required>
-
-        <label for="prefLength">Preferred Length of Each Study Session (0.5 to 2 hours):</label>
-        <input type="number" id="prefLength" step="0.5" min="0.5" max="2" required>
-        
-        <button onclick="generatePlan()">Submit</button>
+        <h2>Your Study Schedule</h2>
+        <div id="scheduleOutput"></div>
     </div>
 
-    <div id="output-section">
-        <h2>Study Plan Output:</h2>
-        <ul id="output"></ul>
-    </div>
-
-    <script src="input.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>
+
