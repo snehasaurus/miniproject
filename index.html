@@ -1,74 +1,142 @@
-// Define global variables
-const SUBJECTS = ["Math", "Eng", "Comp"];  // Example subjects
-const STUDYPLAN = [];
-const DAYS = 30;
-const PREFLEN = 1.5; // Length of each study session in hours
-const breaklen = 0.5; // Length of break in hours
-let STUDYTIME = 'M'; // 'M' for Morning, 'A' for Afternoon, 'E' for Evening
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Study Plan Generator</title>
+</head>
+<body>
+    <h1>Welcome to My Study Plan Generator</h1>
+    <p>This tool will help you create a study plan for your exams.</p>
+    
+    <h2>Output:</h2>
+    <div id="output"></div>  <!-- This is where the output will be displayed -->
 
-// Function to convert decimal time to HH:MM format
-function formatTime(decimalTime) {
-    let hours = Math.floor(decimalTime);
-    let minutes = Math.round((decimalTime - hours) * 60);
-    if (minutes === 60) {
-        hours += 1;
-        minutes = 0;
-    }
-    return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
-}
+    <script>
+        function inputStudyPlan() {
+            let NUM = prompt("Enter number of exams");
+            NUM = parseInt(NUM);
 
-// Generate a study plan for 30 days
-function genStudyPlan() {
-    for (let k = 0; k < DAYS; k++) {
-        STUDYPLAN[k] = [];
-        let hours_left = 4; // Example hours per day
-        let session_start_time = 8; // Example start time 08:00 in 24-hour format
-        let slot_index = 0;
+            let DATES = new Array(NUM);
+            let SUBJECTS = new Array(NUM);
+            let DIFFICULTY = new Array(NUM);
 
-        // Assign subjects per day
-        for (let i = 0; i < SUBJECTS.length; i++) {
-            if (hours_left <= 0) break;
+            for (let i = 0; i < NUM; i++) {
+                let DATE = prompt("Enter exam date (day number)");
+                DATES[i] = parseInt(DATE);
 
-            // Calculate end time for session
-            let session_end_time = session_start_time + PREFLEN;
-            let formatted_start = formatTime(session_start_time);
-            let formatted_end = formatTime(session_end_time);
+                let SUBJECT = prompt("Enter exam topic");
+                SUBJECTS[i] = SUBJECT.toString();
 
-            // Fill the study plan with formatted times
-            STUDYPLAN[k][slot_index] = `Study ${SUBJECTS[i]} from ${formatted_start} to ${formatted_end}`;
-            hours_left -= PREFLEN;
-
-            // Adjust the start time
-            session_start_time = session_end_time + breaklen;
-
-            // Move to next slot if necessary (adjusting for different study times)
-            if (session_start_time >= 12 && STUDYTIME === 'M') {
-                slot_index = 1;
-                session_start_time = 16; // Afternoon starts at 16:00
-            } else if (session_start_time >= 19 && STUDYTIME === 'A') {
-                slot_index = 2;
-                session_start_time = 18; // Evening starts at 18:00
-            } else if (session_start_time >= 22 && STUDYTIME === 'E') {
-                break; // End day if we hit the evening end time
+                let DIFF = prompt("Enter difficulty level - E for EASY, M for MEDIUM, D for DIFFICULT");
+                DIFFICULTY[i] = DIFF.toUpperCase();
             }
+
+            let STUDYTIME = prompt("Enter preferred study time -> M for MORNING, A for AFTERNOON, E for EVENING").toUpperCase();
+            let TOTALHRS = parseInt(prompt("Enter number of hours you want to devote per day"));
+            let PREFLEN = parseFloat(prompt("Enter preferred length of each study session in hours (between 0.5 hrs to 2 hours)"));
+
+            return {
+                NUM,
+                DATES,
+                SUBJECTS,
+                DIFFICULTY,
+                STUDYTIME,
+                TOTALHRS,
+                PREFLEN
+            };
         }
-    }
-}
 
-// Function to display the study plan
-function displayStudyPlan() {
-    let output = "<h2>Output:</h2><ul>";
-    for (let day = 0; day < STUDYPLAN.length; day++) {
-        output += `<li>Day ${day + 1}: `;
-        output += STUDYPLAN[day].join(", ");
-        output += `</li>`;
-    }
-    output += "</ul>";
-    document.getElementById("output").innerHTML = output;
-}
+        function genStudyPlan(input) {
+            let { NUM, DATES, SUBJECTS, DIFFICULTY, STUDYTIME, TOTALHRS, PREFLEN } = input;
+            
+            let STUDYPLAN = Array.from({ length: 30 }, () => new Array(3).fill("Subject of choice"));
+            let breaklen = 0;
 
-// Run the functions
-document.addEventListener("DOMContentLoaded", function () {
-    genStudyPlan();  // Generate the plan
-    displayStudyPlan();  // Display it
-});
+            if (PREFLEN === 1.5 || PREFLEN === 2) {
+                breaklen = 0.5;
+            } else if (PREFLEN === 1) {
+                breaklen = 0.25;
+            } else {
+                breaklen = 0.083; 
+            }
+
+            let DAYS_BEFORE_EXAM = new Array(NUM);
+            let START_DATE = new Array(NUM);
+
+            for (let i = 0; i < NUM; i++) {
+                if (DIFFICULTY[i] === 'D') {
+                    DAYS_BEFORE_EXAM[i] = 4;
+                } else if (DIFFICULTY[i] === 'M') {
+                    DAYS_BEFORE_EXAM[i] = 3;
+                } else {
+                    DAYS_BEFORE_EXAM[i] = 2;
+                }
+                START_DATE[i] = DATES[i] - DAYS_BEFORE_EXAM[i];
+            }
+
+            for (let i = 0; i < NUM; i++) {
+                for (let k = START_DATE[i]; k < DATES[i]; k++) {
+                    let hours_left = TOTALHRS;
+                    let session_start_time = 0;
+                    let slot_index = 0;
+
+                    if (STUDYTIME === 'M') {
+                        session_start_time = 8;
+                        slot_index = 0;
+                    } else if (STUDYTIME === 'A') {
+                        session_start_time = 16;
+                        slot_index = 1;
+                    } else {
+                        session_start_time = 18;
+                        slot_index = 2;
+                    }
+
+                    while (hours_left > 0 && slot_index < 3) {
+                        let session_end_time = session_start_time + PREFLEN;
+                        STUDYPLAN[k][slot_index] = Study ${SUBJECTS[i]} from ${session_start_time} to ${session_end_time};
+                        hours_left -= PREFLEN;
+
+                        session_start_time = session_end_time + breaklen;
+
+                        if (session_start_time >= 12 && STUDYTIME === 'M') {
+                            slot_index = 1;
+                            session_start_time = 16;
+                        } else if (session_start_time >= 19 && STUDYTIME === 'A') {
+                            slot_index = 2;
+                            session_start_time = 18;
+                        } else if (session_start_time >= 22 && STUDYTIME === 'E') {
+                            break;
+                        }
+                    }
+                }
+            }
+
+            return STUDYPLAN;
+        }
+
+        // Function to display the study plan on the webpage
+        function displayStudyPlan(studyPlan) {
+            const outputDiv = document.getElementById('output');
+            outputDiv.innerHTML = ''; // Clear previous output
+
+            // Create a list to display the study plan
+            const ul = document.createElement('ul');
+            studyPlan.forEach((day, index) => {
+                const li = document.createElement('li');
+                li.textContent = Day ${index + 1}: ${day.join(', ')};
+                ul.appendChild(li);
+            });
+
+            outputDiv.appendChild(ul); // Append the list to the output div
+        }
+
+        // Get user input and generate the study plan
+        let userInput = inputStudyPlan();
+        let studyPlan = genStudyPlan(userInput);
+        displayStudyPlan(studyPlan); // Display the study plan on the webpage
+    </script>
+</body>
+</html>
+
+
