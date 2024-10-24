@@ -47,6 +47,17 @@
             };
         }
 
+        // Function to convert decimal time to HH:MM format
+        function formatTime(decimalTime) {
+            let hours = Math.floor(decimalTime);
+            let minutes = Math.round((decimalTime - hours) * 60);
+            if (minutes === 60) {
+                hours += 1;
+                minutes = 0;
+            }
+            return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+        }
+
         function genStudyPlan(input) {
             let { NUM, DATES, SUBJECTS, DIFFICULTY, STUDYTIME, TOTALHRS, PREFLEN } = input;
             
@@ -58,7 +69,7 @@
             } else if (PREFLEN === 1) {
                 breaklen = 0.25;
             } else {
-                breaklen = 0.083; 
+                breaklen = 0.083; // Small break for shorter study sessions
             }
 
             let DAYS_BEFORE_EXAM = new Array(NUM);
@@ -94,7 +105,9 @@
 
                     while (hours_left > 0 && slot_index < 3) {
                         let session_end_time = session_start_time + PREFLEN;
-                        STUDYPLAN[k][slot_index] = `Study ${SUBJECTS[i]} from ${session_start_time} to ${session_end_time}`;
+                        let formatted_start = formatTime(session_start_time);
+                        let formatted_end = formatTime(session_end_time);
+                        STUDYPLAN[k][slot_index] = `Study ${SUBJECTS[i]} from ${formatted_start} to ${formatted_end}`;
                         hours_left -= PREFLEN;
 
                         session_start_time = session_end_time + breaklen;
@@ -138,4 +151,3 @@
     </script>
 </body>
 </html>
-
